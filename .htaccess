@@ -1,0 +1,3 @@
+ErrorDocument 404 http://localhost/Covid19Awerness/errors/404.php
+ErrorDocument 403 http://localhost/Covid19Awerness/errors/403.php
+ErrorDocument 500 http://localhost/Covid19Awerness/errors/500.php
