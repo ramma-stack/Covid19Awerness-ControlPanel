@@ -1,6 +1,7 @@
 <?php
 ob_start();
 include './includes/header.php';
+include './includes/page.php';
 
 //user in time login
 $a = validate($_COOKIE['name']);
@@ -16,7 +17,7 @@ $alert = '';
 $users = mysqli_query($conn, "SELECT * FROM $database.`post` WHERE `userid` = '$userid'");
 $num_row = mysqli_num_rows($users);
 
-// sql to update a record
+// sql to create a record
 if (isset($_POST['create'])) {
 
     $title = validate($_POST['title']);
@@ -24,37 +25,57 @@ if (isset($_POST['create'])) {
     $privilege = validate($_POST['privilege']);
 
     $errors = array();
-    $file_name = $_FILES['image']['name'];
-    $file_size = $_FILES['image']['size'];
-    $file_tmp = $_FILES['image']['tmp_name'];
-    $file_type = $_FILES['image']['type'];
+    if (!empty($_FILES['image']['size'])) {
 
-    $file_ext_part = explode('.', $file_name);
-    $file_ext_end = end($file_ext_part);
-    $file_ext = strtolower($file_ext_end);
+        $file_name = $_FILES['image']['name'];
+        $file_size = $_FILES['image']['size'];
+        $file_tmp = $_FILES['image']['tmp_name'];
+        $file_type = $_FILES['image']['type'];
 
-    $newfilename = rand() . '.' . $file_ext;
+        $file_ext_part = explode('.', $file_name);
+        $file_ext_end = end($file_ext_part);
+        $file_ext = strtolower($file_ext_end);
 
-    $expensions = array("jpeg", "jpg", "png");
+        $newfilename = rand() . '.' . $file_ext;
 
-    if (in_array($file_ext, $expensions) === false) {
-        $errors[] = "extension not allowed, please choose a JPEG, JPG or PNG file.";
-    }
+        $expensions = array("jpeg", "jpg", "png");
 
-    if ($file_size > 7097152) {
-        $errors[] = 'File size must be excately 7 MB';
-    }
-
-    if (empty($errors) == true) {
-
-        $sql = "INSERT INTO $database.`post`(`title`, `details`, `privilege`, `image`, `userid`) VALUES ('$title','$details','$privilege','$newfilename','$userid')";
-        $alert = '';
-        if ($conn->query($sql) === TRUE) {
-            move_uploaded_file($file_tmp, "images/post/" . $newfilename);
-            $alert = "Record updated successfully, Please Refresh That Page!";
-        } else {
-            $alert = "Error updating record!" . $conn->error;
+        if (in_array($file_ext, $expensions) === false) {
+            $errors[] = "extension not allowed, please choose a JPEG, JPG or PNG file.";
         }
+
+        if ($file_size > 7097152) {
+            $errors[] = 'File size must be excately 7 MB';
+        }
+
+        if (empty($errors) == true) {
+
+            $sql = "INSERT INTO $database.`post`(`title`, `details`, `privilege`, `image`, `userid`) VALUES ('$title','$details','$privilege','$newfilename','$userid')";
+            $alert = '';
+            if ($conn->query($sql) === TRUE) {
+                move_uploaded_file($file_tmp, "images/post/" . $newfilename);
+                $alert = "Record updated successfully, Please Refresh That Page!";
+            } else {
+                $alert = "Error updating record!" . $conn->error;
+            }
+        }
+    } else {
+        $alert = "Please Image Upload for post!";
+    }
+}
+
+// sql to save a record
+if (isset($_POST['save'])) {
+
+    $title = validate($_POST['title']);
+    $details = validate($_POST['details']);
+
+    $sql = "INSERT INTO $database.`savepost`(`title`, `details`, `userid`) VALUES ('$title','$details','$userid')";
+    $alert = '';
+    if ($conn->query($sql) === TRUE) {
+        $alert = "Record Save successfully, Please Refresh That Page!";
+    } else {
+        $alert = "Error Save record!" . $conn->error;
     }
 }
 
@@ -132,7 +153,7 @@ if (isset($_POST['create'])) {
                                 Input Post Title
                             </div>
                             <div class="card-body">
-                                <input type="text" id="title" name="title" class="form-control py-2 fs-5" placeholder="Title" required>
+                                <input type="text" value="<?php echo isset($_POST['title']) ? htmlspecialchars($_POST['title'], ENT_QUOTES) : ''; ?>" id="title" name="title" class="form-control py-2 fs-5" placeholder="Title" required>
                             </div>
                         </div>
                     </div>
@@ -145,7 +166,7 @@ if (isset($_POST['create'])) {
                             </div>
                             <div class="card-body">
                                 <div class="form-group with-title mb-3">
-                                    <textarea class="form-control" id="detail" name="details" rows="10" required></textarea>
+                                    <textarea class="form-control" id="detail" name="details" rows="10" required><?php echo isset($_POST['details']) ? htmlspecialchars($_POST['details'], ENT_QUOTES) : ''; ?></textarea>
                                     <label>Post Details</label>
                                 </div>
                             </div>
@@ -163,7 +184,7 @@ if (isset($_POST['create'])) {
                                     <label class="input-group-text" for="inputGroupFile01">
                                         <i class="bi bi-upload"></i>
                                     </label>
-                                    <input type="file" class="form-control" id="image" name="image" required>
+                                    <input type="file" class="form-control" id="image" name="image">
                                 </div>
                             </div>
                         </div>
@@ -245,9 +266,10 @@ if (isset($_POST['create'])) {
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex px-4 pt-0 pb-4 gap-2">
-                        <button name="create" class="btn btn-lg btn-primary w-50 py-2">Create Post</button>
-                        <button type="button" onclick="ClearFields()" class="btn btn-lg btn-dark w-50 py-2">Clear Filds</button>
+                    <div class="d-flex flex-wrap px-4 pt-0 pb-4 gap-2">
+                        <button name="create" class="btn btn-lg btn-primary py-2">Create Post</button>
+                        <button name="save" class="btn btn-lg btn-secondary py-2">Save Post</button>
+                        <button type="button" onclick="ClearFields()" class="btn btn-lg btn-dark py-2">Clear Filds</button>
                     </div>
                 </div>
             </div>

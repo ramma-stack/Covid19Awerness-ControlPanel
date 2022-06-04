@@ -23,10 +23,11 @@ $results_per_page  = 8;
 if ($user['rule'] == 'editor') {
     $users = mysqli_query($conn, "SELECT * FROM $database.`post` WHERE `title` LIKE '%$search%' AND `userid` = '$userid' order by `id` desc");
     $num_row = mysqli_num_rows($users);
+    // echo $num_row;
     if ($num_row === 0) {
         $alert = "Data Not Found!";
     }
-} else {
+} elseif ($user['rule'] == 'admin') {
     $users = mysqli_query($conn, "SELECT * FROM $database.`post` WHERE `title` LIKE '%$search%' order by `id` desc");
     $num_row = mysqli_num_rows($users);
     if ($num_row === 0) {
@@ -44,9 +45,20 @@ if (!isset($_GET['page'])) {
 
 $number_of_post_on_page = ($page - 1) * $results_per_page;
 
-$users = "SELECT * FROM $database.`post` WHERE `title` LIKE '%$search%' order by `id` desc limit $number_of_post_on_page , $results_per_page";
-
-$result = mysqli_query($conn, $users);
+if ($user['rule'] == 'editor') {
+    $result = mysqli_query($conn, "SELECT * FROM $database.`post` WHERE `title` LIKE '%$search%' AND `userid` = '$userid' order by `id` desc limit $number_of_post_on_page , $results_per_page");
+    $num_row = mysqli_num_rows($result);
+    // echo $num_row;
+    if ($num_row === 0) {
+        $alert = "Data Not Found!";
+    }
+} elseif ($user['rule'] == 'admin') {
+    $result = mysqli_query($conn, "SELECT * FROM $database.`post` WHERE `title` LIKE '%$search%' order by `id` desc limit $number_of_post_on_page , $results_per_page");
+    $num_row = mysqli_num_rows($result);
+    if ($num_row === 0) {
+        $alert = "Data Not Found!, Please Refresh That Page!";
+    }
+}
 
 // sql to delete a record
 if (isset($_POST['delete'])) {
@@ -328,7 +340,7 @@ if (isset($_POST['updateImage'])) {
         <ul class="pagination pagination-primary">
             <?php if ($page > 1) { ?>
                 <li class="page-item">
-                    <?php echo '<a class="page-link" href="' . htmlspecialchars($_SERVER['PHP_SELF']) . '?page=' . $page - 1 . '">Prev</a> '; ?>
+                    <?php echo '<a class="page-link" href="' . htmlspecialchars($_SERVER['PHP_SELF']) . '?page=' . ($page - 1) . '">Prev</a> '; ?>
                 </li>
             <?php } else { ?>
                 <li class="page-item disabled"><a class="page-link" href="#">Prev</a></li>
@@ -340,7 +352,7 @@ if (isset($_POST['updateImage'])) {
             <?php } ?>
             <?php if ($i - 1 > $page) { ?>
                 <li class="page-item">
-                    <?php echo '<a class="page-link" href="' . htmlspecialchars($_SERVER['PHP_SELF']) . '?page=' . $page + 1 . '">Next</a> '; ?>
+                    <?php echo '<a class="page-link" href="' . htmlspecialchars($_SERVER['PHP_SELF']) . '?page=' . ($page + 1) . '">Next</a> '; ?>
                 </li>
             <?php } else { ?>
                 <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>

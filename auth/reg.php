@@ -66,11 +66,12 @@ if (isset($_POST['register'])) {
             }
 
             if (empty($errors) == true) {
-                move_uploaded_file($file_tmp, "../images/" . $newfilename);
 
-                $sql = "INSERT INTO $database.`user` (`fullname`, `tagname`, `password`, `gender`, `email`, `image`, `rule`) VALUES ('$fullname', '$tagename', '$password', '$gender', '$email', '$newfilename', 'editor');";
+                $sql = "INSERT INTO $database.`user` ( `fullname`, `tagname`, `password`, `gender`, `phone`, `ex`, `addr`, `email`, `code`, `rule`, `image`) VALUES ('$fullname', '$tagename', '$password', '$gender', '964', '', '', '$email', '0', 'editor', '$newfilename');";
+                // INSERT INTO `user`(`id`, `fullname`, `tagname`, `password`, `gender`, `phone`, `ex`, `addr`, `email`, `code`, `rule`, `image`) VALUES ()
                 $alert = '';
                 if ($conn->query($sql) === TRUE) {
+                    move_uploaded_file($file_tmp, "../images/" . $newfilename);
                     $alert = "Record Inserted successfully";
                 } else {
                     $alert = "Error Inserting record!";

@@ -45,7 +45,7 @@ function Mailer($email, $number_random)
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'ramear0@gmail.com';
-        $mail->Password   = '4880raz@321';
+        $mail->Password   = '4880shae@321';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port       = 465;
 
